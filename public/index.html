@@ -2,52 +2,115 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Calculateur de Trajets Snapdesk</title>
+    <title>Calculateur Snapdesk</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; }
-        button { background: #e590a1; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; }
-        #results { margin-top: 20px; padding: 15px; background: #f9f9f9; display: none; }
+        :root { --snap-rose: #e590a1; --snap-dark: #2d3436; }
+        body { font-family: 'Helvetica Neue', sans-serif; background: #fdfdfd; color: var(--snap-dark); margin: 0; padding: 20px; }
+        .card { max-width: 650px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h1 { color: var(--snap-rose); font-size: 24px; margin-bottom: 30px; }
+        label { display: block; margin: 15px 0 5px; font-weight: bold; font-size: 14px; }
+        input, textarea, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: 1px solid #ddd; background: #f5f5f5; border-radius: 8px; cursor: pointer; }
+        .tab-btn.active { background: var(--snap-rose); color: white; border-color: var(--snap-rose); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button#mainBtn { background: var(--snap-rose); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 25px; }
+        #results { margin-top: 30px; display: none; padding: 20px; background: #fff5f6; border-radius: 12px; border: 1px solid var(--snap-rose); }
     </style>
 </head>
 <body>
-    <h2>Calculateur Snapdesk (Vercel Test)</h2>
-    <form id="calcForm">
-        <input type="file" id="csvFile" accept=".csv" required>
-        <input type="text" id="adr1" placeholder="Adresse Bureau Candidat 1" required>
-        <input type="text" id="nom1" placeholder="Nom du bureau (ex: Candidat A)" required>
-        <select id="tempsMax">
-            <option value="30">30 minutes</option>
-            <option value="45">45 minutes</option>
-            <option value="60">60 minutes</option>
-        </select>
-        <button type="submit" id="btn">Lancer l'Analyse</button>
-    </form>
+    <div class="card">
+        <h1>Où installer vos futurs bureaux ? 🚀</h1>
+        
+        <form id="calcForm">
+            <label>Votre adresse email (pour recevoir l'étude complète)</label>
+            <input type="email" id="email" placeholder="nom@entreprise.fr" required>
 
-    <div id="results"></div>
+            <label>Adresses des collaborateurs</label>
+            <div class="tabs">
+                <div class="tab-btn active" onclick="setMode('manual')">Copier-coller</div>
+                <div class="tab-btn" onclick="setMode('csv')">Fichier CSV</div>
+            </div>
+            
+            <div id="inputManual">
+                <textarea id="manual_addresses" rows="4" placeholder="12 rue de la Paix, Paris&#10;45 avenue de la République, Lyon..."></textarea>
+            </div>
+            <div id="inputCSV" style="display:none">
+                <input type="file" id="csvFile" accept=".csv">
+            </div>
+
+            <label>Bureau Candidat 1 (Obligatoire)</label>
+            <div class="grid">
+                <input type="text" id="nom1" value="Candidat A">
+                <input type="text" id="adr1" placeholder="Adresse complète" required>
+            </div>
+
+            <label>Bureau Candidat 2 (Optionnel)</label>
+            <div class="grid">
+                <input type="text" id="nom2" value="Candidat B">
+                <input type="text" id="adr2" placeholder="Adresse complète">
+            </div>
+
+            <label>Objectif de trajet max (minutes)</label>
+            <select id="tempsMax">
+                <option value="30">30 min</option>
+                <option value="45" selected>45 min</option>
+                <option value="60">60 min</option>
+            </select>
+
+            <button type="submit" id="mainBtn">Calculer l'accessibilité</button>
+        </form>
+
+        <div id="results"></div>
+    </div>
 
     <script>
+        let mode = 'manual';
+        function setMode(m) {
+            mode = m;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('inputManual').style.display = m === 'manual' ? 'block' : 'none';
+            document.getElementById('inputCSV').style.display = m === 'csv' ? 'block' : 'none';
+        }
+
         document.getElementById('calcForm').onsubmit = async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn');
-            const resDiv = document.getElementById('results');
-            btn.innerText = "Calcul en cours...";
-            
+            const btn = document.getElementById('mainBtn');
+            btn.innerText = "Analyse en cours...";
+            btn.disabled = true;
+
             const formData = new FormData();
-            formData.append('file', document.getElementById('csvFile').files[0]);
-            formData.append('adr_1', document.getElementById('adr1').value);
+            formData.append('email', document.getElementById('email').value);
             formData.append('nom_1', document.getElementById('nom1').value);
+            formData.append('adr_1', document.getElementById('adr1').value);
+            formData.append('nom_2', document.getElementById('nom2').value);
+            formData.append('adr_2', document.getElementById('adr2').value);
             formData.append('temps_max', document.getElementById('tempsMax').value);
+
+            if (mode === 'csv') {
+                formData.append('file', document.getElementById('csvFile').files[0]);
+            } else {
+                formData.append('manual_addresses', document.getElementById('manual_addresses').value);
+            }
 
             try {
                 const response = await fetch('/api/calculate', { method: 'POST', body: formData });
                 const data = await response.json();
+                const resDiv = document.getElementById('results');
                 resDiv.style.display = "block";
-                resDiv.innerHTML = "<h3>Résultats :</h3>" + JSON.stringify(data);
+                
+                let html = "<h3>📊 Résultats</h3>";
+                data.forEach(r => {
+                    html += `<p><strong>${r.nom}</strong>: ${r.moyen} min en moyenne (${r.couverture}% sous l'objectif)</p>`;
+                });
+                resDiv.innerHTML = html;
             } catch (err) {
-                alert("Erreur technique. Vérifie les logs sur Vercel.");
+                alert("Erreur lors du calcul.");
+            } finally {
+                btn.innerText = "Calculer l'accessibilité";
+                btn.disabled = false;
             }
-            btn.innerText = "Lancer l'Analyse";
         };
     </script>
 </body>
