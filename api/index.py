@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pandas as pd
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import io
 import time
@@ -18,7 +18,7 @@ SPREADSHEET_ID = "16CmT1OMabFmJzXNKNU4qbsu1-8Jy37RQAUcWn1KhmYE"
 
 MODE_TRANSPORT = "transit"
 BATCH_SIZE = 25
-HEURE_DEPART_TIMESTAMP = int(datetime(2025, 12, 1, 8, 0).timestamp())
+HEURE_DEPART_TIMESTAMP = int((datetime.now() + timedelta(days=7)).replace(hour=8, minute=0).timestamp())
 
 def log_to_google_sheet(data_log):
     if not GSPREAD_CREDENTIALS_JSON: return
