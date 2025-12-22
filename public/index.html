@@ -132,4 +132,132 @@
             border-bottom: 1px solid #eee;
             font-size: 14px;
         }
-        .val-moyen {
+        .val-moyen { font-weight: bold; }
+        .success { color: #27ae60; font-weight: bold; }
+        .warning { color: #e67e22; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Où installer vos futurs bureaux ? 🚀</h1>
+    <p class="subtitle">Comparez l'accessibilité de vos candidats en un clic.</p>
+    
+    <form id="calcForm">
+        <label>Votre adresse email professionnel</label>
+        <input type="email" id="email" placeholder="lucie@entreprise.fr" required>
+
+        <label>Adresses de vos collaborateurs</label>
+        <div class="tabs">
+            <div class="tab-btn active" id="tabManual" onclick="setMode('manual')">Copier-coller</div>
+            <div class="tab-btn" id="tabCSV" onclick="setMode('csv')">Importer un CSV</div>
+        </div>
+        
+        <div id="inputManual">
+            <textarea id="manual_addresses" rows="4" placeholder="12 rue de la Paix, Paris&#10;45 avenue de la République, Lyon..."></textarea>
+        </div>
+        <div id="inputCSV" style="display:none">
+            <input type="file" id="csvFile" accept=".csv">
+            <p style="font-size: 11px; color: #888;">Le CSV doit contenir : 'Nom de la voie', 'Code postal', 'Ville'.</p>
+        </div>
+
+        <label>Bureau Candidat 1</label>
+        <div class="grid">
+            <input type="text" id="nom1" value="Candidat A">
+            <input type="text" id="adr1" placeholder="Adresse complète" required>
+        </div>
+
+        <label>Bureau Candidat 2 (Optionnel)</label>
+        <div class="grid">
+            <input type="text" id="nom2" value="Candidat B">
+            <input type="text" id="adr2" placeholder="Adresse complète">
+        </div>
+
+        <button type="submit" id="mainBtn">Calculer l'accessibilité</button>
+    </form>
+
+    <div id="results">
+        </div>
+</div>
+
+<script>
+    let mode = 'manual';
+
+    function setMode(m) {
+        mode = m;
+        document.getElementById('tabManual').classList.toggle('active', m === 'manual');
+        document.getElementById('tabCSV').classList.toggle('active', m === 'csv');
+        document.getElementById('inputManual').style.display = m === 'manual' ? 'block' : 'none';
+        document.getElementById('inputCSV').style.display = m === 'csv' ? 'block' : 'none';
+    }
+
+    document.getElementById('calcForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('mainBtn');
+        const resDiv = document.getElementById('results');
+        
+        btn.innerText = "Analyse des trajets en cours...";
+        btn.disabled = true;
+        resDiv.style.display = "none";
+
+        const formData = new FormData();
+        formData.append('email', document.getElementById('email').value);
+        formData.append('nom_1', document.getElementById('nom1').value);
+        formData.append('adr_1', document.getElementById('adr1').value);
+        formData.append('nom_2', document.getElementById('nom2').value);
+        formData.append('adr_2', document.getElementById('adr2').value);
+
+        if (mode === 'csv') {
+            const fileInput = document.getElementById('csvFile');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+        } else {
+            formData.append('manual_addresses', document.getElementById('manual_addresses').value);
+        }
+
+        try {
+            const response = await fetch('/api/calculate', { 
+                method: 'POST', 
+                body: formData 
+            });
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                alert(data.error);
+            } else {
+                resDiv.style.display = "block";
+                let html = "<h3>📊 Résultats d'accessibilité</h3>";
+                html += "<table><thead><tr><th>Bureau</th><th>Moyen</th><th>< 30 min</th><th>< 45 min</th></tr></thead><tbody>";
+                
+                data.forEach(r => {
+                    const c30Class = r.couv_30 > 50 ? 'success' : 'warning';
+                    const c45Class = r.couv_45 > 70 ? 'success' : 'warning';
+                    
+                    html += `<tr>
+                        <td><strong>${r.nom}</strong></td>
+                        <td class="val-moyen">${r.moyen} min</td>
+                        <td class="${c30Class}">${r.couv_30}%</td>
+                        <td class="${c45Class}">${r.couv_45}%</td>
+                    </tr>`;
+                });
+                
+                html += "</tbody></table>";
+                html += "<p style='font-size: 12px; color: #666; margin-top: 20px;'>Une étude plus détaillée a été envoyée à votre équipe.</p>";
+                resDiv.innerHTML = html;
+                
+                // Scroll automatique vers les résultats
+                resDiv.scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (err) {
+            alert("Une erreur est survenue lors de la communication avec le serveur.");
+        } finally {
+            btn.innerText = "Calculer l'accessibilité";
+            btn.disabled = false;
+        }
+    };
+</script>
+
+</body>
+</html>
