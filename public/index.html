@@ -5,143 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculateur d'Accessibilité Snapdesk</title>
     <style>
-        :root {
-            --snap-rose: #e590a1;
-            --snap-dark: #2d3436;
-            --snap-gray: #f9f9f9;
-        }
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fcfcfc;
-            color: var(--snap-dark);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 650px;
-            margin: 40px auto;
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        h1 {
-            color: var(--snap-rose);
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        p.subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 0.9em;
-        }
-        label {
-            display: block;
-            margin: 20px 0 8px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-        input:focus {
-            border-color: var(--snap-rose);
-            outline: none;
-        }
-        /* Système d'onglets */
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background: #f5f5f5;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .tab-btn.active {
-            background: var(--snap-rose);
-            color: white;
-            border-color: var(--snap-rose);
-        }
-        /* Grilles pour les bureaux */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 10px;
-        }
-        button#mainBtn {
-            background: var(--snap-rose);
-            color: white;
-            border: none;
-            padding: 18px;
-            width: 100%;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 30px;
-            transition: transform 0.1s;
-        }
-        button#mainBtn:active {
-            transform: scale(0.98);
-        }
-        button#mainBtn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        /* Résultats */
-        #results {
-            margin-top: 30px;
-            display: none;
-            padding: 25px;
-            background: #fffafa;
-            border-radius: 15px;
-            border: 1px solid #ffe4e8;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th {
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #888;
-            border-bottom: 2px solid var(--snap-rose);
-            padding-bottom: 10px;
-        }
-        td {
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-        .val-moyen { font-weight: bold; }
-        .success { color: #27ae60; font-weight: bold; }
-        .warning { color: #e67e22; font-weight: bold; }
+        :root { --snap-rose: #e590a1; --snap-dark: #2d3436; }
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #fcfcfc; color: var(--snap-dark); margin: 0; padding: 20px; }
+        .container { max-width: 650px; margin: 40px auto; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h1 { color: var(--snap-rose); font-size: 24px; text-align: center; margin-bottom: 30px; }
+        label { display: block; margin: 20px 0 8px; font-weight: bold; font-size: 14px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border: 1px solid #ddd; background: #f5f5f5; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-weight: 600; }
+        .tab-btn.active { background: var(--snap-rose); color: white; border-color: var(--snap-rose); }
+        .grid { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+        button#mainBtn { background: var(--snap-rose); color: white; border: none; padding: 18px; width: 100%; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 30px; }
+        #results { margin-top: 30px; display: none; padding: 25px; background: #fffafa; border-radius: 15px; border: 1px solid #ffe4e8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { text-align: left; font-size: 12px; color: #888; border-bottom: 2px solid var(--snap-rose); padding-bottom: 10px; }
+        td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>Où installer vos futurs bureaux ? 🚀</h1>
-    <p class="subtitle">Comparez l'accessibilité de vos candidats en un clic.</p>
     
     <form id="calcForm">
         <label>Votre adresse email professionnel</label>
@@ -158,26 +42,24 @@
         </div>
         <div id="inputCSV" style="display:none">
             <input type="file" id="csvFile" accept=".csv">
-            <p style="font-size: 11px; color: #888;">Le CSV doit contenir : 'Nom de la voie', 'Code postal', 'Ville'.</p>
         </div>
 
         <label>Bureau Candidat 1</label>
         <div class="grid">
-            <input type="text" id="nom1" value="Candidat A">
+            <input type="text" id="nom_1" value="Candidat A">
             <input type="text" id="adr_1" placeholder="Adresse complète" required>
         </div>
 
         <label>Bureau Candidat 2 (Optionnel)</label>
         <div class="grid">
-            <input type="text" id="nom2" value="Candidat B">
+            <input type="text" id="nom_2" value="Candidat B">
             <input type="text" id="adr_2" placeholder="Adresse complète">
         </div>
 
         <button type="submit" id="mainBtn">Calculer l'accessibilité</button>
     </form>
 
-    <div id="results">
-        </div>
+    <div id="results"></div>
 </div>
 
 <script>
@@ -196,68 +78,46 @@
         const btn = document.getElementById('mainBtn');
         const resDiv = document.getElementById('results');
         
-        btn.innerText = "Analyse des trajets en cours...";
+        btn.innerText = "Analyse en cours...";
         btn.disabled = true;
-        resDiv.style.display = "none";
 
         const formData = new FormData();
+        // ATTENTION : On vérifie que les ID correspondent bien aux getElementById
         formData.append('email', document.getElementById('email').value);
-        formData.append('nom_1', document.getElementById('nom1').value);
-        formData.append('adr_1', document.getElementById('adr1').value);
-        formData.append('nom_2', document.getElementById('nom2').value);
-        formData.append('adr_2', document.getElementById('adr2').value);
+        formData.append('nom_1', document.getElementById('nom_1').value);
+        formData.append('adr_1', document.getElementById('adr_1').value);
+        formData.append('nom_2', document.getElementById('nom_2').value);
+        formData.append('adr_2', document.getElementById('adr_2').value);
 
         if (mode === 'csv') {
             const fileInput = document.getElementById('csvFile');
-            if (fileInput.files.length > 0) {
-                formData.append('file', fileInput.files[0]);
-            }
+            if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
         } else {
             formData.append('manual_addresses', document.getElementById('manual_addresses').value);
         }
 
         try {
-            const response = await fetch('/api/calculate', { 
-                method: 'POST', 
-                body: formData 
-            });
-            
+            const response = await fetch('/api/calculate', { method: 'POST', body: formData });
             const data = await response.json();
             
             if (data.error) {
                 alert(data.error);
             } else {
                 resDiv.style.display = "block";
-                let html = "<h3>📊 Résultats d'accessibilité</h3>";
-                html += "<table><thead><tr><th>Bureau</th><th>Moyen</th><th>< 30 min</th><th>< 45 min</th></tr></thead><tbody>";
-                
+                let html = "<h3>📊 Résultats</h3><table><thead><tr><th>Bureau</th><th>Moyen</th><th>< 30 min</th><th>< 45 min</th></tr></thead><tbody>";
                 data.forEach(r => {
-                    const c30Class = r.couv_30 > 50 ? 'success' : 'warning';
-                    const c45Class = r.couv_45 > 70 ? 'success' : 'warning';
-                    
-                    html += `<tr>
-                        <td><strong>${r.nom}</strong></td>
-                        <td class="val-moyen">${r.moyen} min</td>
-                        <td class="${c30Class}">${r.couv_30}%</td>
-                        <td class="${c45Class}">${r.couv_45}%</td>
-                    </tr>`;
+                    html += `<tr><td><strong>${r.nom}</strong></td><td>${r.moyen} min</td><td>${r.couv_30}%</td><td>${r.couv_45}%</td></tr>`;
                 });
-                
                 html += "</tbody></table>";
-                html += "<p style='font-size: 12px; color: #666; margin-top: 20px;'>Une étude plus détaillée a été envoyée à votre équipe.</p>";
                 resDiv.innerHTML = html;
-                
-                // Scroll automatique vers les résultats
-                resDiv.scrollIntoView({ behavior: 'smooth' });
             }
         } catch (err) {
-            alert("Une erreur est survenue lors de la communication avec le serveur.");
+            alert("Erreur technique. Vérifiez la console.");
         } finally {
             btn.innerText = "Calculer l'accessibilité";
             btn.disabled = false;
         }
     };
 </script>
-
 </body>
 </html>
