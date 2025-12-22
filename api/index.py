@@ -108,5 +108,4 @@ def calculate():
     return jsonify(final_results)
 
 # Nécessaire pour Vercel
-def handler(request):
-    return app(request)
+app = app
