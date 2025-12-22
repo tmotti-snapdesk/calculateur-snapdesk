@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculateur de Trajets Snapdesk</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #eee; border-radius: 10px; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; }
+        button { background: #e590a1; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; }
+        #results { margin-top: 20px; padding: 15px; background: #f9f9f9; display: none; }
+    </style>
+</head>
+<body>
+    <h2>Calculateur Snapdesk (Vercel Test)</h2>
+    <form id="calcForm">
+        <input type="file" id="csvFile" accept=".csv" required>
+        <input type="text" id="adr1" placeholder="Adresse Bureau Candidat 1" required>
+        <input type="text" id="nom1" placeholder="Nom du bureau (ex: Candidat A)" required>
+        <select id="tempsMax">
+            <option value="30">30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+        </select>
+        <button type="submit" id="btn">Lancer l'Analyse</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('calcForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn');
+            const resDiv = document.getElementById('results');
+            btn.innerText = "Calcul en cours...";
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('csvFile').files[0]);
+            formData.append('adr_1', document.getElementById('adr1').value);
+            formData.append('nom_1', document.getElementById('nom1').value);
+            formData.append('temps_max', document.getElementById('tempsMax').value);
+
+            try {
+                const response = await fetch('/api/calculate', { method: 'POST', body: formData });
+                const data = await response.json();
+                resDiv.style.display = "block";
+                resDiv.innerHTML = "<h3>Résultats :</h3>" + JSON.stringify(data);
+            } catch (err) {
+                alert("Erreur technique. Vérifie les logs sur Vercel.");
+            }
+            btn.innerText = "Lancer l'Analyse";
+        };
+    </script>
+</body>
+</html>
