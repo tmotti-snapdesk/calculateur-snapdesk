@@ -42,13 +42,11 @@ def get_distances(origine, destinations):
         if res.get('status') != 'OK': return None
         return [el['duration']['value']/60 if el['status'] == 'OK' else None for el in res['rows'][0]['elements']]
     except: return None
-
+        
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
     data = request.form
     user_email = data.get('email', 'Non renseigné')
-    adresse_actuelle = data.get('adresse_actuelle')
-    temps_max = int(data.get('temps_max', 45))
     
     # Récupération des adresses (CSV ou Manuel)
     destinations = []
@@ -61,7 +59,6 @@ def calculate():
             destinations = (df['Nom de la voie'].astype(str) + ", " + df['Code postal'].astype(str) + " " + df['Ville'].astype(str)).tolist()
         except: pass
     elif manual_addresses:
-        # On sépare par ligne et on nettoie
         destinations = [a.strip() for a in manual_addresses.split('\n') if len(a.strip()) > 5]
 
     if not destinations:
@@ -71,7 +68,7 @@ def calculate():
     if data.get('adr_1'): candidats.append({"nom": data.get('nom_1', 'Candidat 1'), "adr": data.get('adr_1')})
     if data.get('adr_2'): candidats.append({"nom": data.get('nom_2', 'Candidat 2'), "adr": data.get('adr_2')})
 
-    # Logging avec l'email
+    # Logging
     log_to_google_sheet({
         'Timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'Email': user_email,
@@ -90,8 +87,17 @@ def calculate():
         
         df_res = pd.DataFrame({'t': all_times}).dropna()
         moyen = df_res['t'].mean() if not df_res.empty else 0
-        couverture = (df_res['t'] <= temps_max).sum() / len(destinations) * 100
-        results.append({"nom": cand['nom'], "moyen": round(moyen, 1), "couverture": round(couverture, 1)})
+        
+        # Calcul des deux seuils
+        couv_30 = (df_res['t'] <= 30).sum() / len(destinations) * 100
+        couv_45 = (df_res['t'] <= 45).sum() / len(destinations) * 100
+        
+        results.append({
+            "nom": cand['nom'], 
+            "moyen": round(moyen, 1), 
+            "couv_30": round(couv_30, 1),
+            "couv_45": round(couv_45, 1)
+        })
 
     return jsonify(results)
 
