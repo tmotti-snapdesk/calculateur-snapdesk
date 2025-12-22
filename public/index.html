@@ -28,7 +28,7 @@
     <h1>Où installer vos futurs bureaux ? 🚀</h1>
     
     <form id="calcForm">
-        <label>Votre adresse email professionnel</label>
+        <label>Votre adresse email professionnelle</label>
         <input type="email" id="email" placeholder="lucie@entreprise.fr" required>
 
         <label>Adresses de vos collaborateurs</label>
@@ -104,7 +104,7 @@
                 alert(data.error);
             } else {
                 resDiv.style.display = "block";
-                let html = "<h3>📊 Résultats</h3><table><thead><tr><th>Bureau</th><th>Moyen</th><th>< 30 min</th><th>< 45 min</th></tr></thead><tbody>";
+                let html = "<h3>📊 Résultats</h3><table><thead><tr><th>Bureau</th><th>Temps de trajet moyen</th><th>< 30 min</th><th>< 45 min</th></tr></thead><tbody>";
                 data.forEach(r => {
                     html += `<tr><td><strong>${r.nom}</strong></td><td>${r.moyen} min</td><td>${r.couv_30}%</td><td>${r.couv_45}%</td></tr>`;
                 });
