@@ -35,13 +35,25 @@ def log_to_google_sheet(data_log):
 
 def get_distances(origine, destinations):
     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-    params = {'origins': origine, 'destinations': '|'.join(destinations), 
-              'mode': MODE_TRANSPORT, 'departure_time': HEURE_DEPART_TIMESTAMP, 'key': API_KEY}
+    params = {
+        'origins': origine, 
+        'destinations': '|'.join(destinations), 
+        'mode': MODE_TRANSPORT, 
+        'departure_time': HEURE_DEPART_TIMESTAMP, 
+        'key': API_KEY
+    }
     try:
         res = requests.get(url, params=params).json()
-        if res.get('status') != 'OK': return None
-        return [el['duration']['value']/60 if el['status'] == 'OK' else None for el in res['rows'][0]['elements']]
-    except: return None
+        # Cette ligne permet de voir enfin pourquoi Google refuse dans les logs Vercel
+        print(f"DEBUG MAPS: {res.get('status')} - {res.get('error_message', '')}")
+        
+        if res.get('status') != 'OK': 
+            return [None] * len(destinations)
+        
+        return [el['duration']['value']/60 if el.get('status') == 'OK' else None for el in res['rows'][0]['elements']]
+    except Exception as e:
+        print(f"ERREUR REQUETE: {e}")
+        return [None] * len(destinations)
         
 @app.route("/api/calculate", methods=["POST"])
 def calculate():
