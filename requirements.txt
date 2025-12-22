@@ -1,0 +1,6 @@
+flask
+flask-cors
+pandas
+requests
+gspread
+oauth2client
