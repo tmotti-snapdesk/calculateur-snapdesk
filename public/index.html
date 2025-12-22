@@ -20,10 +20,33 @@
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th { text-align: left; font-size: 12px; color: #888; border-bottom: 2px solid var(--snap-rose); padding-bottom: 10px; }
         td { padding: 12px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+        .logo-container { text-align: center; margin-bottom: 30px; }
+        .logo-container img { max-width: 180px; height: auto; border-radius: 8px; } /* Ajustez la taille si nécessaire */
+        .cta-button {
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0; /* Centre le bouton et ajoute de l'espace */
+            padding: 15px 30px;
+            background: var(--snap-rose); /* Utilise la couleur existante */
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none; /* Enlève le soulignement du lien */
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .cta-button:hover { background-color: #d17a8c; } /* Effet au survol */
     </style>
 </head>
 <body>
-
+<div class="container">
+    <div class="logo-container">
+        <a href="https://www.snapdesk.fr" target="_blank" rel="noopener noreferrer">
+            <img src="https://www.snapdesk.co/wp-content/uploads/2023/08/logo-snapdesk.png" alt="Logo Snapdesk">
+        </a>
+    </div>
 <div class="container">
     <h1>Où installer vos futurs bureaux ? 🚀</h1>
     
@@ -60,6 +83,9 @@
     </form>
 
     <div id="results"></div>
+    <a href="https://www.snapdesk.co/recherche-bureaux-paris?source=calculateur_trajet" target="_blank" rel="noopener noreferrer" class="cta-button">
+        Présentez-nous votre recherche de bureau
+    </a>
 </div>
 
 <script>
